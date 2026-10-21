@@ -38,10 +38,11 @@ The dashboard's `times it gave the machine back` counter is not a mock: it incre
 
 ## Code
 
-[admin/slothd](https://gitea.amanpal.tech/admin/slothd) — standard library only, no dependencies, no API key.
+[admin/slothd](https://gitea.amanpal.tech/admin/slothd) — standard library only, no dependencies, no API key. Runs on Linux (and WSL) today; macOS needs the gate ported.
 
 ```bash
-git clone ssh://git@gitea.amanpal.tech:222/admin/slothd.git
+git clone https://gitea.amanpal.tech/admin/slothd.git
+cd slothd
 python3 scripts/make_fixtures.py                       # the 16 messy files from this post
 python3 -m slothd.server --inbox fixtures/inbox --var ./var
 ```

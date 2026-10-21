@@ -199,7 +199,16 @@ submission/            the write-up as submitted to the DEV challenge
 ## Tests
 
 ```bash
-python3 -m unittest discover -s tests -v
+python3 -m unittest discover -s tests -v      # 17 tests, no network, no model
+```
+
+CI runs the same suite on every push (`.gitea/workflows/tests.yml`).
+
+## Get it
+
+```bash
+git clone https://gitea.amanpal.tech/admin/slothd.git
+cd slothd && python3 -m unittest discover -s tests -v
 ```
 
 ## Limits, stated plainly
