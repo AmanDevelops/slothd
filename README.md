@@ -207,7 +207,7 @@ CI runs the same suite on every push (`.gitea/workflows/tests.yml`).
 ## Get it
 
 ```bash
-git clone https://gitea.amanpal.tech/admin/slothd.git
+git clone https://github.com/AmanDevelops/slothd.git      # or the mirror: https://gitea.amanpal.tech/admin/slothd
 cd slothd && python3 -m unittest discover -s tests -v
 ```
 
