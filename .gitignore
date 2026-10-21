@@ -1,7 +1,11 @@
+# generated at runtime
+fixtures/
 var/
-demo/
 __pycache__/
 *.pyc
 .venv/
-dev-post.md
-fixtures/
+build/
+*.egg-info/
+demo/raw/
+demo/*.gif
+demo/palette*.png

@@ -1,0 +1,26 @@
+# Run slothd as a user service, so it survives reboots and does not need a terminal.
+#
+#   mkdir -p ~/.config/systemd/user
+#   cp contrib/slothd.service ~/.config/systemd/user/
+#   systemctl --user daemon-reload && systemctl --user enable --now slothd
+#   journalctl --user -u slothd -f
+#
+# Edit ExecStart and the inbox path to match where you put the project.
+
+[Unit]
+Description=slothd - files the boring folder while the machine is idle
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/slothd
+Environment=SLOTHD_IDLE_PCT=70
+ExecStart=/usr/bin/python3 -m slothd.server --inbox %h/Downloads --var %h/.local/state/slothd --port 8010
+Restart=on-failure
+RestartSec=10
+# keep it the least important thing on the box even outside the idle gate
+Nice=19
+IOSchedulingClass=idle
+
+[Install]
+WantedBy=default.target

@@ -16,6 +16,9 @@ At the end it hands you two lines:
 
 No account, no API key, no upload, no bill.
 
+[58-second demo](demo/slothd-demo.mp4) — filing, then dropping an in-flight file the
+moment a build starts, then picking it back up.
+
 ---
 
 ## Why it is slow on purpose
@@ -78,11 +81,37 @@ No dependencies. Python 3.11+, standard library only (`http.server`, `http.clien
 
 ```bash
 python3 -m slothd.server --digest     # the two lines, for a cron job at 08:00
+python3 -m slothd.server --once       # file the queue now and exit (for cron)
 python3 -m slothd.server --undo       # put the last run's files back
 python3 -m slothd.server --undo-all   # put everything in the ledger back
 ```
 
 Options: `--inbox`, `--var`, `--model`, `--port`. Env: `SLOTHD_IDLE_PCT` (default 70).
+
+No dependencies, but it is also a normal package if you would rather install it:
+
+```bash
+pipx install .        # or: pip install --user .
+slothd --inbox ~/Downloads --var ~/.local/state/slothd
+```
+
+### Run it like a daemon
+
+Long-running, idle-gated: [`contrib/slothd.service`](contrib/slothd.service) is a
+systemd user unit (`Nice=19`, `IOSchedulingClass=idle`, restarts on failure).
+
+```bash
+cp contrib/slothd.service ~/.config/systemd/user/
+systemctl --user enable --now slothd && journalctl --user -u slothd -f
+```
+
+Or let cron pick the time instead — `--once` skips the gate because the scheduler
+already decided:
+
+```cron
+30 2 * * *  cd ~/slothd && python3 -m slothd.server --once --inbox ~/Downloads >> ~/.local/state/slothd/cron.log 2>&1
+0  8 * * *  cd ~/slothd && python3 -m slothd.server --digest | mail -s "slothd" you@example.com
+```
 
 ## What it actually did
 
@@ -154,14 +183,17 @@ flag rather than a vendor relationship.
 ## Layout
 
 ```
-slothd/idle.py       the self-excluding idle gate (cgroup cpu.stat, /proc/<pid>/stat)
-slothd/clerk.py      the only prompt in the project, streaming, preemption, fallback
-slothd/runner.py     the loop: scan → wait for idle → one file → ledger → repeat
-slothd/store.py      ledger.jsonl, state.json, stats, digest, undo
-slothd/server.py     http.server on 127.0.0.1 + a small CLI
-ui/index.html        the dashboard: one file, no build step, no CDN
-scripts/             fixture generator, model comparison, demo recorder
-tests/               17 stdlib unittest cases: parsing, clamping, dedupe, undo, digest
+slothd/idle.py         the self-excluding idle gate (cgroup cpu.stat, /proc/<pid>/stat)
+slothd/clerk.py        the only prompt in the project, streaming, preemption, fallback
+slothd/runner.py       the loop: scan → wait for idle → one file → ledger → repeat
+slothd/store.py        ledger.jsonl, state.json, stats, digest, undo
+slothd/server.py       http.server on 127.0.0.1 + a small CLI
+slothd/ui/index.html   the dashboard: one file, no build step, no CDN
+scripts/               fixture generator, model comparison, demo recorder
+tests/                 17 stdlib unittest cases: parsing, clamping, dedupe, undo, digest
+contrib/               systemd unit for running it as a daemon
+submission/            the write-up as submitted to the DEV challenge
+.gitea/workflows/      CI: unit tests on every push
 ```
 
 ## Tests

@@ -100,6 +100,29 @@ class Runner(threading.Thread):
     def stop(self):
         self.stopping = True
 
+    def drain(self, limit=None):
+        """File everything waiting right now, ignoring the idle gate.
+
+        This is the cron mode: the scheduler already decided now is a fine time,
+        so the gate would only fight it.
+        """
+        self.queue = scan(self.inbox, self.store.seen_hashes())
+        if not self.queue:
+            return 0
+        self.run_id = self.store.start_run()
+        filed = 0
+        while self.queue and (limit is None or filed < limit):
+            item = self.queue[0]
+            self._set(status="working", current=os.path.basename(item["path"]))
+            self.queue = self.queue[1:]
+            try:
+                self._file(item)
+                filed += 1
+            except Exception as exc:
+                self._event(f"could not file {item['name']}: {exc}")
+        self._set(status="empty", current=None)
+        return filed
+
     # ---- loop ------------------------------------------------------------
     def run(self):
         try:

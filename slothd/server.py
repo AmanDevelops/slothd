@@ -13,7 +13,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from .runner import Runner
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-UI = os.path.join(HERE, "ui", "index.html")
+# The dashboard ships inside the package so an installed copy still has it.
+UI = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ui", "index.html")
 
 class Handler(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
@@ -76,6 +77,8 @@ def main(argv=None):
     ap.add_argument("--digest", action="store_true", help="print the digest and exit")
     ap.add_argument("--undo", action="store_true", help="restore the last run's files")
     ap.add_argument("--undo-all", action="store_true", help="restore everything in the ledger")
+    ap.add_argument("--once", action="store_true",
+                    help="file everything waiting right now and exit (for cron)")
     args = ap.parse_args(argv)
 
     os.makedirs(args.var, exist_ok=True)
@@ -83,6 +86,9 @@ def main(argv=None):
 
     if args.digest:
         print("\n".join(Handler.runner.store.digest()))
+        return 0
+    if args.once:
+        print(f"filed {Handler.runner.drain()} files")
         return 0
     if args.undo or args.undo_all:
         n = Handler.runner.store.undo_last_run(everything=args.undo_all)

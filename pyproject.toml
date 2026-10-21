@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "slothd"
+version = "0.1.0"
+description = "A chore daemon that only files things while you are not using your machine."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
+authors = [{ name = "Aman", email = "aman@amanpal.tech" }]
+keywords = ["local-first", "llm", "ollama", "gemma", "automation", "open-weights"]
+dependencies = []
+
+[project.scripts]
+slothd = "slothd.server:main"
+
+[project.urls]
+Source = "https://gitea.amanpal.tech/admin/slothd"
+
+[tool.setuptools.packages.find]
+include = ["slothd*"]
+
+[tool.setuptools.package-data]
+slothd = ["ui/*.html"]
