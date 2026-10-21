@@ -8,6 +8,8 @@ tags: devchallenge, hf26challenge
 
 ## What I Built
 
+Every AI tool I have tried this year wants my attention at the exact moment it decides it has something to say. So I built the opposite: a worker that does its job only when nobody is looking, and puts the file down the instant I touch the keyboard.
+
 `slothd` is a chore daemon. You point it at the folder you keep meaning to deal with — mine is a downloads folder full of files called `Untitled document (3).txt` — and it reads each file with a local open-weight model, decides what the thing actually is, renames it, and files it under `sorted/<category>/`.
 
 The interesting part is not the filing. It is the pace. It only works when the machine is genuinely idle, and the moment you start using the computer it **drops the file it is in the middle of** and gets out of the way. You never wait for it, you never watch it, and you never pay for it. You walk away, and the mess quietly shrinks.
